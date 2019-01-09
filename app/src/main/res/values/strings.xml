@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">ZkusebniApp</string>
+    <string name="app_name">Currency APP</string>
+
+    <string-array name="currency">
+        <item>USD</item>
+        <item>EUR</item>
+        <item>GBR</item>
+
+    </string-array>
 </resources>
