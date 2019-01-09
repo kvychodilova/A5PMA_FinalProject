@@ -128,16 +128,11 @@ public class MainActivity extends AppCompatActivity {
             //nasypat do URL data -> z čeho, na co a kolik
             String url;
             try{
-                url=getJson("http://free.currencyconverterapi.com/api/v5/convert?q=EUR_USD&compact=10");
-
-                //url=getJson("https://www.amdoren.com/api/currency.php?api_key=TXD4JQJb9Su2qQa4wzQFwPjHPwsM9E&from="+ indexS1 +"&to="+indexS2+"&amount="+inputval);
+                url=getJson("http://free.currencyconverterapi.com/api/v5/convert?q="+indexS1+"_"+indexS2+"&compact="+inputval);
                 JSONObject finalValtoObject = new JSONObject(url);
-
-               /*JSONObject amountObject = finalValtoObject.getJSONObject("amount");
-                vysledek = finalValtoObject.getString("amount"); */
-
-               JSONObject amountarray = finalValtoObject.getJSONObject("results").getJSONObject("EUR_USD");
-                result[0] = (String.valueOf(amountarray.getJSONObject(String.valueOf("val"))));
+                JSONObject amountarray = finalValtoObject.getJSONObject("results").getJSONObject(indexS1+"_"+indexS2);
+                double resultOUT = amountarray.optDouble("val");
+                result[0]= String.valueOf(resultOUT);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (JSONException e) {
@@ -154,12 +149,8 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String[] strings) {
             //pracuje po doInBackground
             //super.onPostExecute(strings);
-            //double vypisvysledek = Double.parseDouble(result[0]);
-            //vypisvysledek = Double.parseDouble(vysledek);
-            //transferResult.setText(vypisvysledek);
-
-            transferResult.setText(result[0]);
-
+            double vypocet = Double.parseDouble(result[0])*inputval;
+            transferResult.setText(Double.toString(vypocet));
         }
 
         public String getJson(String URL) throws ClientProtocolException, IOException{

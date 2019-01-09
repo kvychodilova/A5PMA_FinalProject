@@ -4,7 +4,7 @@
     <string-array name="currency">
         <item>USD</item>
         <item>EUR</item>
-        <item>GBR</item>
-
+        <item>GBP</item>
+        <item>BGM</item>
     </string-array>
 </resources>
