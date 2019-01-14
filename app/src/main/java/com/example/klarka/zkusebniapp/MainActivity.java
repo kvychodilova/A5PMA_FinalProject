@@ -1,5 +1,7 @@
 package com.example.klarka.zkusebniapp;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -30,7 +32,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-
 public class MainActivity extends AppCompatActivity {
 
     private EditText editText;
@@ -43,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
     private double inputval;
 
     private String vysledek;
+
+    private Button ButtontoSecondAct;
+    //private Button ButtontoMainAct;
 
     private String result[] = new String[10];
 
@@ -57,39 +61,35 @@ public class MainActivity extends AppCompatActivity {
         button = findViewById(R.id.button);
         editText = findViewById(R.id.editText);
         transferResult = findViewById(R.id.transferResult);
+        //ButtontoMainAct=findViewById(R.id.button3);
+        ButtontoSecondAct = findViewById(R.id.button2);
 
         //Add curency to spinners
-       /* List<String> money_list = new ArrayList<>();
-        money_list.add("USD");
-        money_list.add("EUR");
-        money_list.add("GBP");
-        */
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.currency, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.currency, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         S1.setAdapter(adapter);
         S2.setAdapter(adapter);
 
 
         S1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                indexS1 = parent.getItemAtPosition(position).toString();
-                //String fromValue = parent.getItemAtPosition(position).toString();
-                //Toast.makeText(MainActivity.this,"Selected:" + indexS1, Toast.LENGTH_SHORT).show();
-            }
+                 @Override
+                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                     indexS1 = parent.getItemAtPosition(position).toString();
+                     //Toast.makeText(MainActivity.this,"Selected:" + indexS1, Toast.LENGTH_SHORT).show();
+                 }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+                 @Override
+                 public void onNothingSelected(AdapterView<?> parent) {
 
-            }
-        }
+                 }
+             }
         );
 
         S2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 indexS2 = parent.getItemAtPosition(position).toString();
-              //String toValue = parent.getItemAtPosition(position).toString();
+                //String toValue = parent.getItemAtPosition(position).toString();
             }
 
             @Override
@@ -98,10 +98,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        button.setOnClickListener(new View.OnClickListener(){
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                transferResult.setText("Prekladam..");
+                transferResult.setText("Wait for..");
                 //receive input from  user
                 String vstup = editText.getText().toString();
                 //transfer to double
@@ -113,9 +113,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        ButtontoSecondAct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openActivity2();
+            }
+        });
+
     }
 
-    public class calculate extends AsyncTask<String, String, String []> {
+    public void openActivity2() {
+        Intent intent = new Intent(this, SecondActivity.class);
+        startActivity(intent);
+    }
+
+    public class calculate extends AsyncTask<String, String, String[]> {
 
         @Override
         protected void onPreExecute() {
@@ -124,15 +136,21 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected String [] doInBackground(String... strings) {
+        protected String[] doInBackground(String... strings) {
             //nasypat do URL data -> z čeho, na co a kolik
             String url;
-            try{
-                url=getJson("http://free.currencyconverterapi.com/api/v5/convert?q="+indexS1+"_"+indexS2+"&compact="+inputval);
+            try {
+                //Nefunkcni URL
+               /* url = getJson("http://free.currencyconverterapi.com/api/v5/convert?q=" + indexS1 + "_" + indexS2 + "&compact=" + inputval);
                 JSONObject finalValtoObject = new JSONObject(url);
-                JSONObject amountarray = finalValtoObject.getJSONObject("results").getJSONObject(indexS1+"_"+indexS2);
-                double resultOUT = amountarray.optDouble("val");
-                result[0]= String.valueOf(resultOUT);
+                JSONObject amountarray = finalValtoObject.getJSONObject("results").getJSONObject(indexS1 + "_" + indexS2);
+                double resultOUT = amountarray.optDouble("val");*/
+
+               url=getJson("https://www.amdoren.com/api/currency.php?api_key=gqSn6WJPkWj852Fjey7isvPwNEXmkz&from="+indexS1+"&to="+indexS2+"&amount="+inputval);
+               JSONObject finalValObject = new JSONObject(url);
+               //JSONObject amountarray = finalValObject.getJSONObject("amount");
+               double resultOUT = finalValObject.optDouble("amount");
+                result[0] = String.valueOf(resultOUT);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (JSONException e) {
@@ -149,25 +167,26 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String[] strings) {
             //pracuje po doInBackground
             //super.onPostExecute(strings);
-            double vypocet = Double.parseDouble(result[0])*inputval;
+            double vypocet = Double.parseDouble(result[0]);
             transferResult.setText(Double.toString(vypocet));
+            transferResult.setTextColor(Color.BLUE);
         }
 
-        public String getJson(String URL) throws ClientProtocolException, IOException{
+        public String getJson(String URL) throws ClientProtocolException, IOException {
 
-                StringBuilder build = new StringBuilder();
-                HttpClient client = new DefaultHttpClient();
-                HttpGet httpGet =  new HttpGet(URL);
-                HttpResponse response = client.execute(httpGet);
-                HttpEntity entity = response.getEntity();
-                InputStream content = entity.getContent();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(content));
-                String con;
+            StringBuilder build = new StringBuilder();
+            HttpClient client = new DefaultHttpClient();
+            HttpGet httpGet = new HttpGet(URL);
+            HttpResponse response = client.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            InputStream content = entity.getContent();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+            String con;
 
-                while ((con=reader.readLine()) != null){
-                    build.append(con);
-                }
-                return build.toString();
+            while ((con = reader.readLine()) != null) {
+                build.append(con);
+            }
+            return build.toString();
 
         }
 
