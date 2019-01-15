@@ -35,25 +35,22 @@ import org.json.JSONObject;
 public class MainActivity extends AppCompatActivity {
 
     private EditText editText;
-    private Button button;
+    private Button button, ButtontoSecondAct;
     private Spinner S1, S2;
     private TextView transferResult;
-
-    private String indexS1;
-    private String indexS2;
+    private String indexS1,indexS2;
     private double inputval;
-
-    private String vysledek;
-
-    private Button ButtontoSecondAct;
-    //private Button ButtontoMainAct;
-
     private String result[] = new String[10];
-
+    private int positionS1,positionS2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(savedInstanceState!=null) {
+            inputval = Double.parseDouble(savedInstanceState.getString("INPUTSET"));
+            S1.setSelection(positionS1);
+            S2.setSelection(positionS2);
+        }
         setContentView(R.layout.activity_main);
 
         S1 = findViewById(R.id.Setter_1);
@@ -61,8 +58,9 @@ public class MainActivity extends AppCompatActivity {
         button = findViewById(R.id.button);
         editText = findViewById(R.id.editText);
         transferResult = findViewById(R.id.transferResult);
-        //ButtontoMainAct=findViewById(R.id.button3);
         ButtontoSecondAct = findViewById(R.id.button2);
+        editText.setText("1");
+
 
         //Add curency to spinners
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.currency, android.R.layout.simple_spinner_item);
@@ -70,18 +68,15 @@ public class MainActivity extends AppCompatActivity {
         S1.setAdapter(adapter);
         S2.setAdapter(adapter);
 
-
         S1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                  @Override
                  public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                      indexS1 = parent.getItemAtPosition(position).toString();
-                     //Toast.makeText(MainActivity.this,"Selected:" + indexS1, Toast.LENGTH_SHORT).show();
-                 }
+                     positionS1=position;
 
+                 }
                  @Override
-                 public void onNothingSelected(AdapterView<?> parent) {
-
-                 }
+                 public void onNothingSelected(AdapterView<?> parent) {}
              }
         );
 
@@ -90,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 indexS2 = parent.getItemAtPosition(position).toString();
                 //String toValue = parent.getItemAtPosition(position).toString();
+                positionS2=position;
             }
 
             @Override
@@ -121,6 +117,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+   @Override
+    protected void onSaveInstanceState(Bundle outState){
+        super.onSaveInstanceState(outState);
+        outState.putString("INPUTSET", String.valueOf(inputval));
+        outState.putInt("Setter1Val",positionS1);
+        outState.putInt("Setter2Val",positionS2);
+   }
 
     public void openActivity2() {
         Intent intent = new Intent(this, SecondActivity.class);
@@ -146,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject amountarray = finalValtoObject.getJSONObject("results").getJSONObject(indexS1 + "_" + indexS2);
                 double resultOUT = amountarray.optDouble("val");*/
 
-               url=getJson("https://www.amdoren.com/api/currency.php?api_key=gqSn6WJPkWj852Fjey7isvPwNEXmkz&from="+indexS1+"&to="+indexS2+"&amount="+inputval);
+               url=getJson("https://www.amdoren.com/api/currency.php?api_key=piyUHMjLPUvygSTvbFqzbH5mJpAuRT&from="+indexS1+"&to="+indexS2+"&amount="+inputval);
                JSONObject finalValObject = new JSONObject(url);
                //JSONObject amountarray = finalValObject.getJSONObject("amount");
                double resultOUT = finalValObject.optDouble("amount");
@@ -167,9 +170,15 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String[] strings) {
             //pracuje po doInBackground
             //super.onPostExecute(strings);
-            double vypocet = Double.parseDouble(result[0]);
-            transferResult.setText(Double.toString(vypocet));
-            transferResult.setTextColor(Color.BLUE);
+            try{
+                double vypocet = Double.parseDouble(result[0]);
+                transferResult.setText(Double.toString(vypocet));
+                transferResult.setTextColor(Color.BLUE);
+
+            }catch(Exception e){
+                Toast.makeText(MainActivity.this,"Není přístupné připojení k internetu", Toast.LENGTH_SHORT).show();
+            }
+
         }
 
         public String getJson(String URL) throws ClientProtocolException, IOException {
