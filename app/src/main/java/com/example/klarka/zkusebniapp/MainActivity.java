@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject amountarray = finalValtoObject.getJSONObject("results").getJSONObject(indexS1 + "_" + indexS2);
                 double resultOUT = amountarray.optDouble("val");*/
 
-               url=getJson("https://www.amdoren.com/api/currency.php?api_key=piyUHMjLPUvygSTvbFqzbH5mJpAuRT&from="+indexS1+"&to="+indexS2+"&amount="+inputval);
+               url=getJson("https://www.amdoren.com/api/currency.php?api_key=MTgpmuEvXcXQCVStMpK72X9mNDB3bn&from="+indexS1+"&to="+indexS2+"&amount="+inputval);
                JSONObject finalValObject = new JSONObject(url);
                //JSONObject amountarray = finalValObject.getJSONObject("amount");
                double resultOUT = finalValObject.optDouble("amount");
